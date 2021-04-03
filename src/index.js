@@ -4,18 +4,23 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-function Square({ val = 'i', handleClick }){
-  const [value, setValue] = useState(val)
+function Square({ val = 'i', handleClick, ki }){
     return (
-      <button className="square" onClick={()=> setValue('X') }   >
-        {value}
+      <button className="square" ki={ki} onClick={()=> handleClick(ki) }   >
+        {val}
       </button>
     );
 }
 
 function Board () {
+  const [values, setValues] = useState(Array(9).fill(null))
+  const handleClick = i => {
+    const squares = values.slice()
+    squares[i] = 'X'
+    setValues(squares)
+  }
   const renderSquare = i => {
-    return <Square val={i} handleClick={i}  />;
+    return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
   }
   const status = 'Next player: X';
 
