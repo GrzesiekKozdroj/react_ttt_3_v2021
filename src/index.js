@@ -4,6 +4,26 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+function calculateWinner(squares) {
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+  for (let i = 0; i < lines.length; i++) {
+    const [a, b, c] = lines[i];
+    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+      return squares[a];
+    }
+  }
+  return null;
+}
+
 function Square({ val = 'i', handleClick, ki }){
     return (
       <button className="square" ki={ki} onClick={()=> handleClick(ki) }   >
@@ -12,17 +32,23 @@ function Square({ val = 'i', handleClick, ki }){
     );
 }
 
+
 function Board () {
   const [values, setValues] = useState(Array(9).fill(null))
+  const [xIsNext, setX] = useState(true)
   const handleClick = i => {
     const squares = values.slice()
-    squares[i] = 'X'
+    squares[i] = xIsNext ? 'X' : 'O'
+    setX(!xIsNext)
     setValues(squares)
+    const winner = calculateWinner(squares)
+    console.log(winner)
   }
+  const status = `Next player: ${xIsNext ? 'X' : 'O'}`;
+
   const renderSquare = i => {
     return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
   }
-  const status = 'Next player: X';
 
     return (
       <div>
@@ -45,6 +71,7 @@ function Board () {
       </div>
     );
 }
+
 
 class Game extends React.Component {
   render() {
