@@ -36,15 +36,17 @@ function Square({ val = 'i', handleClick, ki }){
 function Board () {
   const [values, setValues] = useState(Array(9).fill(null))
   const [xIsNext, setX] = useState(true)
+  const [status, setStatus] = useState(`Next Player: X`)
   const handleClick = i => {
     const squares = values.slice()
+    if (calculateWinner(squares) || squares[i]) {      return     }
     squares[i] = xIsNext ? 'X' : 'O'
     setX(!xIsNext)
     setValues(squares)
+    setStatus(`Next Player: ${!xIsNext ? 'X' : 'O'}`)
     const winner = calculateWinner(squares)
-    console.log(winner)
+    if(winner) setStatus(`Winner is: ${winner}`)
   }
-  const status = `Next player: ${xIsNext ? 'X' : 'O'}`;
 
   const renderSquare = i => {
     return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
