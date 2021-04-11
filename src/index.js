@@ -26,69 +26,83 @@ function calculateWinner(squares) {
 
 function Square({ val = 'i', handleClick, ki }){
     return (
-      <button className="square" ki={ki} onClick={()=> handleClick(ki) }   >
+      <button className="square" key={ki} onClick={()=> handleClick(ki) }   >
         {val}
       </button>
     );
 }
 
 
-function Board () {
-  const [values, setValues] = useState(Array(9).fill(null))
-  const [xIsNext, setX] = useState(true)
-  const [status, setStatus] = useState(`Next Player: X`)
-  const handleClick = i => {
-    const squares = values.slice()
-    if (calculateWinner(squares) || squares[i]) {      return     }
-    squares[i] = xIsNext ? 'X' : 'O'
-    setX(!xIsNext)
-    setValues(squares)
-    setStatus(`Next Player: ${!xIsNext ? 'X' : 'O'}`)
-    const winner = calculateWinner(squares)
-    if(winner) setStatus(`Winner is: ${winner}`)
+const renderSquare = ({i, values, handleClick}) => {
+  return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
+}
+
+const renderRow = ({i, values, handleClick}) => {
+  let produce = []
+  for (let l = i; l < i+3; l++){
+    produce = [...produce, renderSquare({i:l, values, handleClick })]
   }
 
-  const renderSquare = i => {
-    return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
-  }
+  return (
+    <div className="board-row">
+      { produce }
+    </div>
+  )
+}
 
-    return (
-      <div>
-        <div className="status">{status}</div>
-        <div className="board-row">
-          {renderSquare(0)}
-          {renderSquare(1)}
-          {renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {renderSquare(3)}
-          {renderSquare(4)}
-          {renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {renderSquare(6)}
-          {renderSquare(7)}
-          {renderSquare(8)}
-        </div>
-      </div>
-    );
+const HistoryButton = ({i, handleClick}) => {
+  return (
+   <button onClick={()=>handleClick(i-1)} key={i}>{i-1===0?'Start of the Game' : `Turn: ${i-1}`}</button>
+  )
+}
+
+function Board ({values, handleClick, status}) {
+
+  return (
+    <div>
+      <div className="status">{status}</div>
+        {renderRow({i:0, values, handleClick})}
+        {renderRow({i:3, values, handleClick})}
+        {renderRow({i:6, values, handleClick})}
+    </div>
+  );
 }
 
 
-class Game extends React.Component {
-  render() {
+function Game () {
+  const [values, setValues] = useState(Array(9).fill(null))
+  const [xIsNext, setX] = useState(true)
+  const [status, setStatus] = useState(`Next Player: X`)
+  const [history, setHistory] = useState([values])
+  const [historyButtons, sethBtns] = useState([])
+
+  const handleClick = i => {
+    const squares = values.slice()
+    if (calculateWinner(squares) || squares[i]) 
+      {      return     }
+    squares[i] = xIsNext ? 'X' : 'O'
+    setHistory([...history, squares])
+  const historyClick = (i) => { console.log(history[i]) }
+    setX(!xIsNext)
+    setValues(squares)
+    setStatus(`Next Player: ${!xIsNext ? 'X' : 'O'}`)
+    sethBtns([...historyButtons, <HistoryButton i={history.length} handleClick={historyClick} /> ])
+    const winner = calculateWinner(squares)
+    if(winner) 
+      setStatus(`Winner is: ${winner}`)
+  }
+
     return (
       <div className="game">
         <div className="game-board">
-          <Board />
+          <Board values={values} handleClick={handleClick} status={status} />
         </div>
         <div className="game-info">
-          <div>{/* status */}</div>
+          <div>{ historyButtons }</div>
           <ol>{/* TODO */}</ol>
         </div>
       </div>
-    );
-  }
+    )
 }
 
 // ========================================
