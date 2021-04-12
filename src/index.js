@@ -34,7 +34,7 @@ function Square({ val = 'i', handleClick, ki }){
 
 
 const renderSquare = ({i, values, handleClick}) => {
-  return <Square val={values[i]} ki={i} handleClick={ handleClick }  />;
+  return <Square key={i} val={values[i]} ki={i} handleClick={ handleClick }  />;
 }
 
 const renderRow = ({i, values, handleClick}) => {
@@ -52,7 +52,9 @@ const renderRow = ({i, values, handleClick}) => {
 
 const HistoryButton = ({i, handleClick}) => {
   return (
-   <button onClick={()=>handleClick(i-1)} key={i}>{i-1===0?'Start of the Game' : `Turn: ${i-1}`}</button>
+    <li>
+      <button onClick={()=>handleClick(i-1)} key={i} >{i-1===0?'Start of the Game' : `Turn: ${i-1}`}</button>
+    </li>
   )
 }
 
@@ -75,6 +77,7 @@ function Game () {
   const [status, setStatus] = useState(`Next Player: X`)
   const [history, setHistory] = useState([values])
   const [historyButtons, sethBtns] = useState([])
+  const [stepMove, setStepMove] = useState(0)
 
   const handleClick = i => {
     const squares = values.slice()
@@ -82,11 +85,21 @@ function Game () {
       {      return     }
     squares[i] = xIsNext ? 'X' : 'O'
     setHistory([...history, squares])
-  const historyClick = (i) => { console.log(history[i]) }
+    const historyClick = (i) => { 
+      const newXIsNext = (i % 2 === 0)
+      setX( newXIsNext )
+      const slicedHistory = history.slice(0,i+1)
+      const slicedButtons = historyButtons.slice(0,i+1)
+      sethBtns( slicedButtons )
+      setHistory( slicedHistory )
+      setValues( history[i] )
+      setStatus( `Next Player: ${ newXIsNext ? 'X' : 'O' }` )
+     }
     setX(!xIsNext)
+    setStepMove(stepMove+1)
     setValues(squares)
     setStatus(`Next Player: ${!xIsNext ? 'X' : 'O'}`)
-    sethBtns([...historyButtons, <HistoryButton i={history.length} handleClick={historyClick} /> ])
+    sethBtns([...historyButtons, <HistoryButton i={history.length} handleClick={historyClick} key={i} /> ])
     const winner = calculateWinner(squares)
     if(winner) 
       setStatus(`Winner is: ${winner}`)
@@ -98,8 +111,8 @@ function Game () {
           <Board values={values} handleClick={handleClick} status={status} />
         </div>
         <div className="game-info">
-          <div>{ historyButtons }</div>
-          <ol>{/* TODO */}</ol>
+          <div>{/* status */}</div>
+          <ol>{historyButtons}</ol>
         </div>
       </div>
     )
