@@ -112,7 +112,7 @@ function Game () {
         </div>
         <div className="game-info">
           <div>{/* status */}</div>
-          <ol>{historyButtons}</ol>
+          <ul>{historyButtons}</ul>
         </div>
       </div>
     )
